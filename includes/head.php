@@ -6,10 +6,15 @@
 <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
 <!-- Custom Stylesheet -->
 
-<link href="<?php echo assets('public/assets/css/animate/animate.min.css') ?>" rel="stylesheet">
-<link href="<?php echo assets('public/assets/css/datatable/dataTables.bootstrap4.min.css') ?>" rel="stylesheet">
-<link href="<?php echo assets('public/assets/css/datatable/buttons.bootstrap4.min.css') ?>" rel="stylesheet">
-<link href="<?php echo assets('public/assets/css/datatable/select.dataTables.min.css') ?>" rel="stylesheet">
-<link href="<?php echo assets('public/assets/css/style.css') ?>" rel="stylesheet">
-<link href="<?php echo assets('public/assets/css/school.css') ?>" rel="stylesheet">
-<script src="<?php echo assets('public/assets/js/common/common.min.js') ?>"></script>
+<link href="<?= urlPath('public/assets/css/animate/animate.min.css')?>" rel="stylesheet">
+<link href="<?= urlPath('public/assets/css/datatable/dataTables.bootstrap4.min.css') ?>" rel="stylesheet">
+<link href="<?= urlPath('public/assets/css/datatable/buttons.bootstrap4.min.css')?>" rel="stylesheet">
+<link href="<?= urlPath('public/assets/css/datatable/select.dataTables.min.css')?>" rel="stylesheet">
+<link href="<?= urlPath('public/assets/css/style.css')?>" rel="stylesheet">
+<link href="<?= urlPath('public/assets/css/school.css')?>" rel="stylesheet">
+<script src="<?= urlPath('public/assets/js/common/common.min.js')?>"></script>
+
+<script src="<?= urlPath('public/assets/js/custom.min.js') ?>"></script>
+<script src="<?= urlPath('public/assets/js/settings.js') ?>"></script>
+<script src="<?= urlPath('public/assets/js/gleek.js') ?>"></script>
+<script src="<?= urlPath('public/assets/js/styleSwitcher.js') ?>"></script>

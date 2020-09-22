@@ -7,20 +7,13 @@
     ?>
 </head>
 <body>
-<div id="preloader">
-    <div class="loader">
-        <svg class="circular" viewBox="25 25 50 50">
-            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10"/>
-        </svg>
-    </div>
-</div>
 <div id="main-wrapper">
     <div class="content-body body-height bg-home">
         <div class="row page-titles mx-0">
             <div class="col p-md-0">
                 <div class="breadcrumb">
-                    <li class="mr-3"><a href="register">Register</a></li>
-                    <li class=" active"><a href="login">Login</a></li>
+                    <li class="mr-3"><a href="<?= urlPath('userController/register') ?>">Register</a></li>
+                    <li class=" active"><a href="<?= urlPath('userController/login') ?>">Login</a></li>
                 </div>
             </div>
         </div>
@@ -32,10 +25,7 @@
     </div>
 </div>
 
-<script src="<?php echo assets('public/assets/js/custom.min.js') ?>"></script>
-<script src="<?php echo assets('public/assets/js/settings.js') ?>"></script>
-<script src="<?php echo assets('public/assets/js/gleek.js') ?>"></script>
-<script src="<?php echo assets('public/assets/js/styleSwitcher.js') ?>"></script>
+
 
 </body>
 </html>

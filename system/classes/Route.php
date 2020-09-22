@@ -1,6 +1,6 @@
 <?php
 
-class Rout
+class Route
 {
     public $controller = 'Welcome';
     public $method = 'index';

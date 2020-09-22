@@ -1,6 +1,6 @@
 <?php
-$user_id = $_SESSION['sess_user_id'];
-$where = 'id =' . $user_id;
+$user_id = $myData;
+$where = 'id =' . $user_id[0];
 $sidebar = $sc->show(false, $where);
 ?>
 <div class="nk-sidebar">
@@ -12,16 +12,16 @@ $sidebar = $sc->show(false, $where);
                 </a>
                 <ul aria-expanded="false">
                     <?php if ($sidebar[0]['role_id'] == 1 || $sidebar[0]['role_id'] == 2) { ?>
-                        <li><a href="principal">principals</a></li>
-                        <li><a href="teacher">Teachers</a></li>
-                        <li><a href="student">Students</a></li>
+                        <li><a href="<?= urlPath('Principal') ?>">principals</a></li>
+                        <li><a href="<?= urlPath('Teacher')?>">Teachers</a></li>
+                        <li><a href="<?= urlPath('Student') ?>">Students</a></li>
                         <?php
                     }
                     if ($sidebar[0]['role_id'] == 3) { ?>
-                        <li><a href="teacher">Teachers</a></li>
-                        <li><a href="student">Students</a></li>
-                        <li><a href="classes.php">Classes</a></li>
-                        <li><a href="subject">Subjects</a></li>
+                        <li><a href="<?= urlPath('Teacher')?>">Teachers</a></li>
+                        <li><a href="<?= urlPath('Student') ?>">Students</a></li>
+                        <li><a href="<?= urlPath('classController')?>">Classes</a></li>
+                        <li><a href="<?= urlPath('subjectController')?>">Subjects</a></li>
                         <?php
                     }
                     if ($sidebar[0]['role_id'] == 4) { ?>
