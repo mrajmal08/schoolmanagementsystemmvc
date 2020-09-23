@@ -5,9 +5,9 @@ $session = $myData;
 $tableBody = $body;
 
 if ($user) {
-    $actionPath = urlPath('Student/updateStudent');
+    $actionPath = urlPath('studentController/updateStudent');
 } else {
-    $actionPath = urlPath('Student/createStudent');
+    $actionPath = urlPath('studentController/createStudent');
 }
 include '../includes/include.php'; ?>
 
@@ -47,7 +47,7 @@ include '../includes/include.php'; ?>
                                                    $user['email'] : ""; ?>"
                                                placeholder="test@test.com" required>
                                         <?php
-                                        if(!empty($error['email'])) {
+                                        if (!empty($error['email'])) {
                                             $this->print_errors($error['email']);
                                         }
                                         ?>
@@ -76,7 +76,7 @@ include '../includes/include.php'; ?>
                                                    $user['password'] : ""; ?>"
                                                placeholder="******" required>
                                         <?php
-                                        if(!empty($error['password'])) {
+                                        if (!empty($error['password'])) {
                                             $this->print_errors($error['password']);
                                         }
                                         ?>
@@ -143,25 +143,25 @@ include '../includes/include.php'; ?>
                             $action = [
                                 'button1' => [
                                     'value' => 'delete',
-                                    'url' => 'Student/delete',
+                                    'url' => "" . urlPath('studentController') . "/delete",
                                     'require' => ['id'],
                                     'class' => 'btn btn-danger btn-sm'
                                 ],
                                 'button2' => [
                                     'value' => 'edit',
-                                    'url' => 'Student/edit',
+                                    'url' => "" . urlPath('studentController') . "/edit",
                                     'require' => ['id'],
                                     'class' => 'btn btn-warning btn-sm'
                                 ],
                                 'button3' => [
                                     'value' => 'assign_class',
-                                    'url' => 'Student/assignClass',
+                                    'url' => "" . urlPath('studentController') . "/assignClass",
                                     'require' => ['id'],
                                     'class' => 'btn btn-primary btn-sm'
                                 ],
                                 'button4' => [
                                     'value' => 'assign_subject',
-                                    'url' => 'Student/assignSubject',
+                                    'url' => "" . urlPath('studentController') . "/assignSubject",
                                     'require' => ['id'],
                                     'class' => 'btn btn-secondary btn-sm'
                                 ]

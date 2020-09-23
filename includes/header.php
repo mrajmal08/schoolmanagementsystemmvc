@@ -11,14 +11,14 @@ $header = $sc->show(false, $where);
                 <span class="toggle-icon"><i class="icon-menu"></i></span>
             </div>
             <?php if ($header[0]['role_id'] == 1) { ?>
-                <a href="requested" type="button" class="btn mb-1 btn-rounded btn-success text-white">
+                <a href="<?= urlPath('userController/requestedUser') ?>" type="button" class="btn mb-1 btn-rounded btn-success text-white">
                     Requested User</a>
             <?php } ?>
         </div>
         <div class="header-right">
             <ul class="clearfix">
                 <li class="icons dropdown">
-                    <?php echo '<h5>Welcome ' . $user_id[1] . '</h5>'; ?>
+                    <?php echo '<h5>welcomeController ' . $user_id[1] . '</h5>'; ?>
                     <div class="user-img c-pointer position-relative" data-toggle="dropdown">
                         <span class="activity active"></span>
                         <img src="#" height="40" width="40" alt="">

@@ -1,7 +1,8 @@
 <?php
 
-class Admin extends Database
+trait Admin
 {
+
     /**
      * this function user for approve the user request
      * @param $user_id
@@ -32,5 +33,4 @@ class Admin extends Database
                  user.status = 0";
         return $this->get_data_for_query($query);
     }
-
 }

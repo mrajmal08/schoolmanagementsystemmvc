@@ -2,19 +2,27 @@
 
 class subjectController extends Framework
 {
+    use Validation;
+    use Student;
+    protected $sessionId;
+    protected $tableBody;
+
+    /** initialize the constructor */
+    public function __construct()
+    {
+        $this->sessionId = getSessionData();
+        $this->tableBody = $this->model('subjectModel');
+        $this->tableBody = $this->tableBody->show();
+    }
+
     public function index()
     {
-        /** get session */
-        $userId = getSessionData();
-        $tbody = $this->model('subjectModel');
-        $tbody = $tbody->getSubject();
-        $this->view('subjects', $userId, $tbody);
+        $this->view('subjects', $this->sessionId, $this->tableBody);
     }
 
     /** create principal */
     public function createSubject()
     {
-        $userId = getSessionData();
         $create = $this->model('subjectModel');
         if (isset($_POST['submitSubject'])) {
             $rules = [
@@ -24,22 +32,20 @@ class subjectController extends Framework
             $this->validate($data, $rules);
             if ($this->errors) {
                 $error = $this->errors;
-                $tbody = $create->getSubject();
-                $this->view('subjects', $userId, $tbody, $error);
+                $this->view('subjects', $this->sessionId, $this->tableBody, $error);
             } else {
-                $name = $_POST['name'];
-                $author = $_POST['author'];
+                $name = input('name');
+                $author = input('author');
                 $data = [
                     'name' => $name,
                     'author' => $author,
                 ];
                 $columns = ['name', 'author'];
                 $values = [':name', ':author'];
-                $result = $create->insertSubject($columns, $values, $data);
-                if ($result){
-                    $tbody = $create->getSubject();
-                    $this->view('subjects',$userId, $tbody);
-                }else{
+                $result = $create->insert($columns, $values, $data);
+                if ($result) {
+                    $this->view('subjects', $this->sessionId, $this->tableBody);
+                } else {
                     return "Something problem";
                 }
             }
@@ -49,14 +55,13 @@ class subjectController extends Framework
     /** edit get user id principal */
     public function edit()
     {
-        $userId = getSessionData();
         $edit = $this->model('subjectModel');
         if (isset($_GET['type']) && $_GET['type'] == 'edit') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
-                $user = $edit->editSubject($user_id);
-                $body = $edit->getSubject();
-                $this->view('subjects', $userId, $body, '', $user);
+                $where = 'id =' . $user_id;
+                $user = $edit->show(1, $where);
+                $this->view('subjects', $this->sessionId, $this->tableBody, '', $user);
 
             }
         }
@@ -65,7 +70,6 @@ class subjectController extends Framework
     /** Update principal */
     public function updateSubject()
     {
-        $userId = getSessionData();
         $update = $this->model('subjectModel');
         if (isset($_POST['edit'])) {
             unset($_POST['edit']);
@@ -73,10 +77,9 @@ class subjectController extends Framework
             $data['data'] = $_POST;
             $where = "id = " . $_POST['subject_id'];
             unset($data['data']['subject_id']);
-            $result = $update->updateSubject($data, $where);
+            $result = $update->update($data, $where);
             if ($result) {
-                $body = $update->getSubject();
-                $this->view('subjects', $userId, $body);
+                $this->view('subjects', $this->sessionId, $this->tableBody);
             }
         }
     }
@@ -84,16 +87,22 @@ class subjectController extends Framework
     /** delete principal */
     public function delete()
     {
-        $userId = getSessionData();
         $delete = $this->model('subjectModel');
         if (isset($_GET['type']) && $_GET['type'] == 'delete') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
-                $where = "id = ". $user_id;
-                $delete->deleteSubject($where);
-                $body = $delete->getSubject();
-                $this->view('subjects', $userId, $body);
+                $where = "id = " . $user_id;
+                $delete->delete($where);
+                $this->view('subjects', $this->sessionId, $this->tableBody);
             }
         }
+    }
+
+    /** get my Subjects */
+    public function mySubject()
+    {
+        $subject = $this->model('subjectModel');
+        $getSubjects = $subject->user_class_subject($this->sessionId[0], 'subject');
+        $this->view('mySubjects', $this->sessionId, $getSubjects);
     }
 }

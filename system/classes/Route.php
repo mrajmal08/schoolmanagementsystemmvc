@@ -2,7 +2,7 @@
 
 class Route
 {
-    public $controller = 'Welcome';
+    public $controller = 'welcomeController';
     public $method = 'index';
     public $param = [];
 
@@ -15,7 +15,7 @@ class Route
                 $this->controller = $url[0];
                 unset($url[0]);
             } else {
-                echo "<span style='color: red'>Sorry " . $url[0] . ".php not found</span>";
+                return "Sorry " . $url[0] . ".php not found";
             }
         }
         /** includes controller **/
@@ -28,7 +28,7 @@ class Route
                 $this->method = $url[1];
                 unset($url[1]);
             } else {
-                echo "<span style='color: red'>Sorry method " . $url[1] . ".php not found</span>";
+                echo "Sorry method " . $url[1] . ".php not found";
             }
         }
         if (isset($url)) {

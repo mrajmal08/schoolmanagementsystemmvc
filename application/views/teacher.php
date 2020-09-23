@@ -5,9 +5,9 @@ $session = $myData;
 $tableBody = $body;
 
 if ($user) {
-    $actionPath = urlPath('Teacher/updateTeacher');
+    $actionPath = urlPath('teacherController/updateTeacher');
 } else {
-    $actionPath = urlPath('Teacher/createTeacher');
+    $actionPath = urlPath('teacherController/createTeacher');
 }
 
 include '../includes/include.php'; ?>
@@ -46,7 +46,7 @@ include '../includes/include.php'; ?>
                                                    $user['email'] : ""; ?>"
                                                placeholder="test@test.com" required>
                                         <?php
-                                        if(!empty($error['email'])) {
+                                        if (!empty($error['email'])) {
                                             $this->print_errors($error['email']);
                                         }
                                         ?>
@@ -75,7 +75,7 @@ include '../includes/include.php'; ?>
                                                    $user['password'] : ""; ?>"
                                                placeholder="******" required>
                                         <?php
-                                        if(!empty($error['password'])) {
+                                        if (!empty($error['password'])) {
                                             $this->print_errors($error['password']);
                                         }
                                         ?>
@@ -143,13 +143,13 @@ include '../includes/include.php'; ?>
                             $action = [
                                 'button1' => [
                                     'value' => 'delete',
-                                    'url' => 'Teacher/delete',
+                                    'url' => "" . urlPath('teacherController') . "/delete",
                                     'require' => ['id'],
                                     'class' => 'btn btn-danger btn-sm'
                                 ],
                                 'button2' => [
                                     'value' => 'edit',
-                                    'url' => 'Teacher/edit',
+                                    'url' => "" . urlPath('teacherController') . "/edit",
                                     'require' => ['id'],
                                     'class' => 'btn btn-warning btn-sm'
                                 ],

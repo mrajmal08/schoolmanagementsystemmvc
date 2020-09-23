@@ -1,21 +1,36 @@
 <?php
 
-class Principal extends Framework
+class principalController extends Framework
 {
+    use Validation;
+    protected $sessionId;
+    protected $tbody;
+
+    /** initialize the constructor */
+    public function __construct()
+    {
+        $this->sessionId = getSessionData();
+        $this->tbody = $this->model('principalModel');
+        $where = "status = 1 AND role_id = 2";
+        $this->tbody = $this->tbody->show(false, $where);
+    }
+
+    /** getting default page of principal with data and session */
     public function index()
     {
-        /** get session */
-        $userId = getSessionData();
-        $tbody = $this->model('principalModel');
-        $tbody = $tbody->getPrincipal();
-        $this->view('principal', $userId, $tbody);
+        $this->view('principal', $this->sessionId, $this->tbody);
     }
 
     /** create principal */
     public function createPrincipal()
     {
-        $userId = getSessionData();
         $create = $this->model('principalModel');
+        $sessionRole = $this->sessionId[2];
+        if ($sessionRole == 1) {
+            $status = 1;
+        } else {
+            $status = 0;
+        }
         if (isset($_POST['submitPrincipal'])) {
             $rules = [
                 'name' => 'required|max:6',
@@ -26,15 +41,14 @@ class Principal extends Framework
             $this->validate($data, $rules);
             if ($this->errors) {
                 $error = $this->errors;
-                $tbody = $create->getPrincipal();
-                $this->view('principal', $userId, $tbody, $error);
+                $this->view('principal', $this->sessionId, $this->tbody, $error);
             } else {
-                $name = $this->input('name');
-                $email = $this->input('email');
-                $password = $this->input('password');
-                $address = $this->input('address');
-                $contact = $this->input('contact');
-                $gender = $this->input('gender');
+                $name = input('name');
+                $email = input('email');
+                $password = input('password');
+                $address = input('address');
+                $contact = input('contact');
+                $gender = input('gender');
                 $role = 2;
                 $data = [
                     'name' => $name,
@@ -44,16 +58,16 @@ class Principal extends Framework
                     'contact' => $contact,
                     'gender' => $gender,
                     'role' => $role,
+                    'status' => $status
 
                 ];
                 $columns = ['name', 'email', 'password', 'address',
-                    'contact', 'gender', 'role_id'];
+                    'contact', 'gender', 'role_id', 'status'];
                 $values = [':name', ':email', ':password', ':address',
-                    ':contact', ':gender', ':role'];
-                $result = $create->insertPrincipal($columns, $values, $data);
+                    ':contact', ':gender', ':role', ':status'];
+                $result = $create->insert($columns, $values, $data);
                 if ($result) {
-                    $tbody = $create->getPrincipal();
-                    $this->view('principal', $userId, $tbody);
+                    $this->view('principal', $this->sessionId, $this->tbody);
                 } else {
                     return "Some thing problem during form submission";
                 }
@@ -64,14 +78,13 @@ class Principal extends Framework
     /** edit get user id principal */
     public function edit()
     {
-        $userId = getSessionData();
         $edit = $this->model('principalModel');
         if (isset($_GET['type']) && $_GET['type'] == 'edit') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
-                $user = $edit->editPrincipal($user_id);
-                $body = $edit->getPrincipal();
-                $this->view('principal', $userId, $body, '', $user);
+                $where = 'id =' . $user_id;
+                $user = $edit-> show(1, $where);
+                $this->view('principal', $this->sessionId, $this->tbody, '', $user);
 
             }
         }
@@ -80,7 +93,6 @@ class Principal extends Framework
     /** Update principal */
     public function updatePrincipal()
     {
-        $userId = getSessionData();
         $update = $this->model('principalModel');
         if (isset($_POST['edit'])) {
             unset($_POST['edit']);
@@ -88,25 +100,22 @@ class Principal extends Framework
             $data['data'] = $_POST;
             $where = "id = " . $_POST['id'];
             unset($data['data']['id']);
-            $result = $update->updatePrincipal($data, $where);
+            $result = $update->update($data, $where);
             if ($result) {
-                $body = $update->getPrincipal();
-               $this->view('principal', $userId, $body);
+               $this->view('principal', $this->sessionId, $this->tbody);
             }
         }
     }
 
     /** delete principal */
     public function delete(){
-        $userId = getSessionData();
         $delete = $this->model('principalModel');
         if (isset($_GET['type']) && $_GET['type'] == 'delete') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
                 $where = "id = " . $user_id;
-                $delete->deletePrincipal($where);
-                $body = $delete->getPrincipal();
-                $this->view('principal',$userId, $body);
+                $delete->delete($where);
+                $this->view('principal',$this->sessionId, $this->tbody);
             }
         }
     }

@@ -26,7 +26,7 @@ class Database
 
 
     /**
-     * this function return fetched data adn required table name and where condition
+     * this function return fetched data and required table name and where condition
      * @param bool $where
      * @return mixed
      */
@@ -48,7 +48,7 @@ class Database
     }
 
     /**
-     * This function used to insert the values of ay type of data given by columns,values and data
+     * This function used to insert the values of any type of data given by columns,values and data
      * @param $columns
      * @param $values
      * @param $data
@@ -106,21 +106,6 @@ class Database
     }
 
     /**
-     * this function used only for query execution
-     * @param $query
-     * @return mixed
-     */
-    protected function get_data_for_query($query)
-    {
-        if (!empty($query)) {
-            $data = $this->conn->query($query);
-            return $data->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * login function
      * @param $email
      * @param $password
@@ -141,187 +126,13 @@ class Database
                     $_SESSION['role'] = $row['role_id'];
                     return true;
                 } else {
-                    return "<span style='color: red'>Invalid email and password!</span>";
+                    return "Invalid email and password!";
                 }
             } catch (PDOException $e) {
                 return "Error : " . $e->getMessage();
             }
         } else {
-            return "<span style='color: red'>Both fields are required!</span>";
-        }
-    }
-
-    /**
-     * dybamic data table function used
-     * @param $thead
-     * @param $tbody
-     * @param $action
-     */
-    public function datatable($thead, $tbody, $action)
-    {
-
-        ?>
-        <div class='table-responsive'>
-            <table class='table table-striped table-bordered zero-configuration'>
-                <thead>
-                <tr>
-                    <?php
-                    for ($i = 0; $i < count($thead); $i++) {
-                        ?>
-                        <th><?= $thead[$i] ?></th>
-                        <?php
-                    }
-                    ?>
-                </tr>
-                </thead>
-                <tbody>
-                <?php
-                foreach ($tbody as $row) {
-                    ?>
-                    <tr>
-                        <?php
-                        foreach ($row as $key => $body) {
-                            if ($key != 'id') {
-                                if ($key != 'status') {
-                                    if ($key != 'role_id') {
-                                        ?>
-                                        <td><?= $body ?></td>
-                                    <?php }
-                                }
-                            }
-                        }
-                        ?>
-                        <td>
-                            <?php $this->buttons($action, $row); ?>
-                        </td>
-                    </tr>
-                <?php } ?>
-                </tbody>
-            </table>
-        </div>
-        <?php
-    }
-
-    /**
-     * buttons function for datatable
-     * @param $action
-     * @param $row
-     */
-    private function buttons($action, $row)
-    {
-        if (!empty($action)) {
-            foreach ($action as $key => $button) {
-                $this->printButton($button, $row);
-            }
-        }
-    }
-
-    /**
-     * this function print the buttons for datatable
-     * @param $button
-     * @param $row
-     */
-    private function printButton($button, $row)
-    {
-        $url = $button['url'] . '?type=' . $button['value'];
-        foreach ($button['require'] as $key => $value) {
-            $url .= "&{$value}=" . $row[$value];
-
-
-        }
-        if (!empty($button['default'])) {
-            foreach ($button['default'] as $key => $value) {
-                $url .= "&{$key}=" . $value;
-            }
-        }
-        ?>
-        <a class="<?= $button['class'] ?>" href="<?= $url; ?>"><?= $button['value'] ?></a>
-        <?php
-    }
-
-    /**
-     * this function returns the user class details and also user subject details
-     * according to their type
-     * @param $user_id
-     * @param null $type
-     * @return mixed
-     */
-    public function user_class_subject($user_id, $type = null)
-    {
-        switch ($type) {
-            case 'class':
-                $query = "SELECT class.id as id, class.name as classname, class.number as classnumber
-                  FROM `user_has_class` 
-                  INNER JOIN user ON user_has_class.user_id = user.id 
-                  INNER JOIN class ON user_has_class.class_id = class.id WHERE user_id = $user_id";
-                return $this->get_data_for_query($query);
-                break;
-            case 'subject':
-                $query = "SELECT subject.id as id, subject.name as subjectname, subject.author as
-                  authorname 
-                  FROM `user_has_subject` INNER JOIN user ON user_has_subject.user_id = user.id
-                  INNER JOIN subject ON user_has_subject.subject_id = subject.id WHERE
-                  user_id = $user_id";
-                return $this->get_data_for_query($query);
-                break;
-            default:
-        }
-    }
-
-    /**
-     * this function used for assigning the class or subject to the user
-     * @param $user_id
-     * @param null $class_id
-     * @param null $subject_id
-     * @return string
-     */
-    public function assign_class_subject($user_id, $class_id = null, $subject_id = null)
-    {
-        if (!empty($class_id)) {
-            try {
-                //ids for show data
-                $data = [
-                    'user_id' => $user_id,
-                    'class_id' => $class_id,
-                ];
-                //getting columns and values for insert query
-                $where = "user_id = " . $user_id . " AND class_id = " . $class_id;
-                $result = $this->show(false, $where);
-                if (!empty($result)) {
-                    return "<span style='color: red'>class already asssigned</span>";
-                } else {
-                    //getting columns and values for insert query
-                    $columns = ['user_id', 'class_id'];
-                    $values = [':user_id', ':class_id'];
-
-                    $this->insert($columns, $values, $data);
-                }
-            } catch (PDOException $e) {
-                return "Error : " . $e->getMessage();
-            }
-        } elseif (!empty($subject_id)) {
-            try {
-                //ids for show data
-                $data = [
-                    'user_id' => $user_id,
-                    'subject_id' => $subject_id,
-                ];
-                //getting columns and values for insert query
-                $where = "user_id = " . $user_id . " AND subject_id = " . $subject_id;
-                $result = $this->show(false, $where);
-                if (!empty($result)) {
-                    return "<span style='color: red'>class already asssigned</span>";
-                } else {
-                    //getting columns and values for insert query
-                    $columns = ['user_id', 'subject_id'];
-                    $values = [':user_id', ':subject_id'];
-                    $this->insert($columns, $values, $data);
-                }
-            } catch (PDOException $e) {
-                return "Error : " . $e->getMessage();
-            }
-        } else {
-            return "<span style='color: red'>Missing class_id || subject_id || user_id </span>";
+            return "Both fields are required!";
         }
     }
 }

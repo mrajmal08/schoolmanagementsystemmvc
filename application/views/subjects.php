@@ -83,13 +83,13 @@ include '../includes/include.php'; ?>
                             $action = [
                                 'button1' => [
                                     'value' => 'delete',
-                                    'url' => 'subjectController/delete',
+                                    'url' => "".urlPath('subjectController') ."/delete",
                                     'require' => ['id'],
                                     'class' => 'btn btn-danger btn-sm'
                                 ],
                                 'button2' => [
                                     'value' => 'edit',
-                                    'url' => 'subjectController/edit',
+                                    'url' => "".urlPath('subjectController') ."/edit",
                                     'require' => ['id'],
                                     'class' => 'btn btn-warning btn-sm'
                                 ],

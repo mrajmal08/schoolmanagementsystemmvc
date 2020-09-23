@@ -2,19 +2,25 @@
 
 class classController extends Framework
 {
+    use Validation;
+    use Student;
+    protected $sessionId;
+    protected $tableBody;
+
+    public function __construct()
+    {
+        $this->sessionId = getSessionData();
+        $this->tableBody = $this->model('classModel');
+        $this->tableBody = $this->tableBody->show();
+    }
     public function index()
     {
-        /** get session */
-        $userId = getSessionData();
-        $tbody = $this->model('classModel');
-        $tbody = $tbody->getClass();
-        $this->view('classes', $userId, $tbody);
+        $this->view('classes', $this->sessionId, $this->tableBody);
     }
 
     /** create principal */
     public function createClass()
     {
-        $userId = getSessionData();
         $create = $this->model('classModel');
         if (isset($_POST['submitClass'])) {
             $rules = [
@@ -24,22 +30,20 @@ class classController extends Framework
             $this->validate($data, $rules);
             if ($this->errors) {
                 $error = $this->errors;
-                $tbody = $create->getClass();
-                $this->view('classes', $userId, $tbody, $error);
+                $this->view('classes', $this->sessionId, $this->tableBody, $error);
             } else {
-                $name = $_POST['name'];
-                $number = $_POST['number'];
+                $name = input('name');
+                $number = input('number');
                 $data = [
                     'name' => $name,
                     'number' => $number,
                 ];
                 $columns = ['name', 'number'];
                 $values = [':name', ':number'];
-                $result = $create->insertClass($columns, $values, $data);
-                if ($result){
-                    $tbody = $create->getClass();
-                    $this->view('classes',$userId, $tbody);
-                }else{
+                $result = $create->insert($columns, $values, $data);
+                if ($result) {
+                    $this->view('classes', $this->sessionId, $this->tableBody);
+                } else {
                     return "Something problem";
                 }
             }
@@ -49,14 +53,13 @@ class classController extends Framework
     /** edit get user id principal */
     public function edit()
     {
-        $userId = getSessionData();
         $edit = $this->model('classModel');
         if (isset($_GET['type']) && $_GET['type'] == 'edit') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
-                $user = $edit->editClass($user_id);
-                $body = $edit->getClass();
-                $this->view('classes', $userId, $body, '', $user);
+                $where = 'id =' . $user_id;
+                $user = $edit->show(1, $where);
+                $this->view('classes', $this->sessionId, $this->tableBody, '', $user);
 
             }
         }
@@ -65,7 +68,6 @@ class classController extends Framework
     /** Update principal */
     public function updateClass()
     {
-        $userId = getSessionData();
         $update = $this->model('classModel');
         if (isset($_POST['edit'])) {
             unset($_POST['edit']);
@@ -73,10 +75,9 @@ class classController extends Framework
             $data['data'] = $_POST;
             $where = "id = " . $_POST['class_id'];
             unset($data['data']['class_id']);
-            $result = $update->updateClass($data, $where);
+            $result = $update->update($data, $where);
             if ($result) {
-                $body = $update->getClass();
-                $this->view('classes', $userId, $body);
+                $this->view('classes', $this->sessionId, $this->tableBody);
             }
         }
     }
@@ -84,16 +85,22 @@ class classController extends Framework
     /** delete principal */
     public function delete()
     {
-        $userId = getSessionData();
         $delete = $this->model('classModel');
         if (isset($_GET['type']) && $_GET['type'] == 'delete') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
-                $where = "id = ". $user_id;
-                $delete->deleteClass($where);
-                $body = $delete->getClass();
-                $this->view('classes', $userId, $body);
+                $where = "id = " . $user_id;
+                $delete->delete($where);
+                $this->view('classes', $this->sessionId, $this->tableBody);
             }
         }
+    }
+
+    /** get all the related classes*/
+    public function myClass()
+    {
+        $class = $this->model('classModel');
+        $getClasses = $class->user_class_subject($this->sessionId[0], 'class');
+        $this->view('myClasses', $this->sessionId, $getClasses);
     }
 }

@@ -2,21 +2,26 @@
 
 class userController extends Framework
 {
-    public $userId;
+    use Validation;
+    protected $sessionId;
+
+    /** initialize the constructor */
+    public function __construct()
+    {
+        $this->sessionId = getSessionData();
+    }
 
     /**  default index page  **/
     public function index()
     {
-        $this->view('welcomeView');
+        $this->view('welcome');
     }
 
     /**  Request register page **/
     public function register()
     {
-
-        $data = $this->model('userModel');
-        $data = $data->getData();
-
+        $data = $this->model('roleModel');
+        $data = $data->show();
         $this->view('register', $data);
     }
 
@@ -37,13 +42,13 @@ class userController extends Framework
                 $error = $this->errors;
                 $this->view('register', $error);
             } else {
-                $name = $this->input('name');
-                $email = $this->input('email');
-                $password = $this->input('password');
-                $address = $this->input('address');
-                $contact = $this->input('contact');
-                $gender = $this->input('gender');
-                $role = $this->input('role');
+                $name = input('name');
+                $email = input('email');
+                $password = input('password');
+                $address = input('address');
+                $contact = input('contact');
+                $gender = input('gender');
+                $role = input('role');
                 $data = [
                     'name' => $name,
                     'email' => $email,
@@ -58,7 +63,7 @@ class userController extends Framework
                     'contact', 'gender', 'role_id'];
                 $values = [':name', ':email', ':password', ':address',
                     ':contact', ':gender', ':role'];
-                $result = $registerData->insertData($columns, $values, $data);
+                $result = $registerData->insert($columns, $values, $data);
                 if ($result) {
                     $this->view('login');
                 } else {
@@ -79,11 +84,12 @@ class userController extends Framework
     {
 
         $loginUser = $this->model('userModel');
-        $email = $this->input('email');
-        $password = $this->input('password');
-        $result = $loginUser->login($email, $password);
+        $email = input('email');
+        $password = input('password');
+        $result = $loginUser->login_user($email, $password);
+//        var_dump($result); exit;
 
-        if ($result) {
+        if ($result == true) {
             $userId = [
                 $_SESSION['sess_user_id'],
                 $_SESSION['sess_name'],
@@ -91,23 +97,63 @@ class userController extends Framework
             ];
             $this->view('home', $userId);
         } else {
-            return 'Something problem';
+            $this->view('login');
+            return 'Invalid email or password';
         }
     }
 
     /**  destroy session   **/
-    public function logout(){
-        $_SESSION['sess_user_id'] = "";
-        $_SESSION['sess_name'] = "";
-        if (empty($_SESSION['sess_user_id']))
-        $this->view('welcomeView');
+    public function logout()
+    {
+        $this->sessionId = '';
+        if (empty($this->sessionId)) {
+            $this->view('welcome');
+        }
     }
 
     /**  Home page with session values  **/
     public function home()
     {
-        $userId = getSessionData();
-        $this->view('home', $userId);
+        $this->view('home', $this->sessionId);
+    }
+
+    /** get requested users*/
+    public function requestedUser()
+    {
+        $data = $this->model('userModel');
+        $data = $data->fetch_requested_data();
+        $this->view('requestedData', $this->sessionId, $data);
+    }
+
+    /** approve requested user*/
+    public function approveUser()
+    {
+        $approve = $this->model('userModel');
+        if (isset($_GET['type']) && $_GET['type'] == 'approve') {
+            $user_id = $_GET['id'];
+            $approve->approve_req($user_id);
+            $data = $approve->fetch_requested_data();
+            $this->view('requested_data', $this->sessionId, $data);
+        } else {
+            $data = $approve->fetch_requested_data();
+            $this->view('requestedData', $this->sessionId, $data);
+        }
+    }
+
+    /** un Approve requested user*/
+    public function unApproveUser()
+    {
+        $approve = $this->model('userModel');
+        if (isset($_GET['type']) && $_GET['type'] == 'un_approve') {
+            $user_id = $_GET['id'];
+            $where = "id = " . $user_id;
+            $approve->delete($where);
+            $data = $approve->fetch_requested_data();
+            $this->view('requestedData', $this->sessionId, $data);
+        }else{
+            $data = $approve->fetch_requested_data();
+            $this->view('requestedData', $this->sessionId, $data);
+        }
     }
 
 }

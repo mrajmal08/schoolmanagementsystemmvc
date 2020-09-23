@@ -5,9 +5,9 @@ $session = $myData;
 $tableBody = $body;
 
 if ($user) {
-    $actionPath = urlPath('Principal/updatePrincipal');
+    $actionPath = urlPath('principalController/updatePrincipal');
 } else {
-    $actionPath = urlPath('Principal/createPrincipal');
+    $actionPath = urlPath('principalController/createPrincipal');
 }
 
 include '../includes/include.php'; ?>
@@ -145,13 +145,13 @@ include '../includes/include.php'; ?>
                             $action = [
                                 'button1' => [
                                     'value' => 'delete',
-                                    'url' => 'Principal/delete',
+                                    'url' => "".urlPath('principalController') ."/delete",
                                     'require' => ['id'],
                                     'class' => 'btn btn-danger btn-sm'
                                 ],
                                 'button2' => [
                                     'value' => 'edit',
-                                    'url' => 'Principal/edit',
+                                    'url' => "".urlPath('principalController') ."/edit",
                                     'require' => ['id'],
                                     'class' => 'btn btn-warning btn-sm'
                                 ],
