@@ -1,5 +1,6 @@
 <?php
-$sess = $myData;
+$sessionId = $this->getSession('id');
+$sessionName = $this->getSession('name');
 $data = $body;
 $singleData = $assigned;
 $resultClass = $userId;

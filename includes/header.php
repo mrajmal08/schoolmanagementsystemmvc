@@ -1,7 +1,7 @@
 <?php
 $sc = new Database('user');
-$user_id = $myData;
-$where = 'id =' . $user_id[0];
+$user_id = $sessionId;
+$where = 'id =' . $user_id;
 $header = $sc->show(false, $where);
 ?>
 <div class="header">
@@ -18,7 +18,7 @@ $header = $sc->show(false, $where);
         <div class="header-right">
             <ul class="clearfix">
                 <li class="icons dropdown">
-                    <?php echo '<h5>welcomeController ' . $user_id[1] . '</h5>'; ?>
+                    <?php echo '<h5>welcome ' . $sessionName . '</h5>'; ?>
                     <div class="user-img c-pointer position-relative" data-toggle="dropdown">
                         <span class="activity active"></span>
                         <img src="#" height="40" width="40" alt="">

@@ -4,29 +4,35 @@ class studentController extends Framework
 {
     use Validation;
     use Student;
-    protected $sessionId;
     protected $tableBody;
+    protected $accountModel;
+    protected $classModel;
+    protected $subjectModel;
+    protected $hasClassModel;
+    protected $hasSubjectModel;
 
     /** initialize the constructor */
     public function __construct()
     {
-        $this->sessionId = getSessionData();
-        $this->tableBody = $this->model('studentModel');
-        $where = "status = 1 AND role_id = 4";
-        $this->tableBody = $this->tableBody->show(false, $where);
+        $this->helper('functions');
+        $this->accountModel = $this->model('studentModel');
+        $this->classModel = $this->model('classModel');
+        $this->subjectModel = $this->model('subjectModel');
+        $this->hasClassModel = $this->model('userHasClassModel');
+        $this->hasSubjectModel = $this->model('userHasSubjectModel');
+        $this->tableBody = $this->tableBody();
     }
 
     /** get default page of student with session */
     public function index()
     {
-        $this->view('student', $this->sessionId, $this->tableBody);
+        $this->view('student', $this->tableBody);
     }
 
     /** create principal */
     public function createStudent()
     {
-        $create = $this->model('studentModel');
-        $sessionRole = $this->sessionId[2];
+        $sessionRole = $this->getSession('role');
         if ($sessionRole == 1) {
             $status = 1;
         } else {
@@ -42,7 +48,7 @@ class studentController extends Framework
             $this->validate($data, $rules);
             if ($this->errors) {
                 $error = $this->errors;
-                $this->view('student', $this->sessionId, $this->tableBody, $error);
+                $this->view('student', $this->tableBody, $error);
             } else {
                 $name = input('name');
                 $email = input('email');
@@ -65,9 +71,9 @@ class studentController extends Framework
                     'contact', 'gender', 'role_id', 'status'];
                 $values = [':name', ':email', ':password', ':address',
                     ':contact', ':gender', ':role', ':status'];
-                $result = $create->insert($columns, $values, $data);
+                $result = $this->accountModel->insert($columns, $values, $data);
                 if ($result) {
-                    $this->view('student', $this->sessionId, $this->tableBody);
+                    $this->view('student', $this->tableBody);
                 } else {
                     return "Some thing problem during form submission";
                 }
@@ -78,13 +84,12 @@ class studentController extends Framework
     /** edit get user id principal */
     public function edit()
     {
-        $edit = $this->model('studentModel');
         if (isset($_GET['type']) && $_GET['type'] == 'edit') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
                 $where = 'id =' . $user_id;
-                $user = $edit->show(1, $where);
-                $this->view('student', $this->sessionId, $this->tableBody, '', $user);
+                $user = $this->accountModel->show(1, $where);
+                $this->view('student', $this->tableBody, '', $user);
 
             }
         }
@@ -93,121 +98,106 @@ class studentController extends Framework
     /** Update principal */
     public function updateStudent()
     {
-        $update = $this->model('studentModel');
         if (isset($_POST['edit'])) {
             unset($_POST['edit']);
             unset($_POST['submitStudent']);
             $data['data'] = $_POST;
             $where = "id = " . $_POST['id'];
             unset($data['data']['id']);
-            $result = $update->update($data, $where);
+            $result = $this->accountModel->update($data, $where);
             if ($result) {
-                $this->view('student', $this->sessionId, $this->tableBody);
+                $this->view('student', $this->tableBody);
             }
         }
     }
 
     public function delete()
     {
-        $delete = $this->model('studentModel');
         if (isset($_GET['type']) && $_GET['type'] == 'delete') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
                 $where = "id = " . $user_id;
-                $delete->delete($where);
-                $this->view('student', $this->sessionId, $this->tableBody);
+                $this->accountModel->delete($where);
+                $this->view('student', $this->tableBody);
             }
         }
     }
 
     public function assignClass()
     {
-        $Class = $this->model('studentModel');
-        $getClass = $this->model('classModel');
         if (!empty($_GET['id'])) {
             $user_id = $_GET['id'];
             $where = 'id =' . $user_id;
-            $data = $Class->show(1, $where);
-            $classes = $getClass->show();
+            $data = $this->accountModel->show(1, $where);
+            $classes = $this->classModel->show();
             $user_id = $data['id'];
-            $singleUserData = $Class->user_class_subject($user_id, 'class');
-            $this->view('assignClass', $this->sessionId, $data, '', $classes, $singleUserData);
+            $singleUserData = $this->accountModel->user_class_subject($user_id, 'class');
+            $this->view('assignClass', $data, '', $classes, $singleUserData);
         }
     }
 
     public function assignSubject()
     {
-        $Subject = $this->model('studentModel');
-        $getSubject = $this->model('subjectModel');
         if (!empty($_GET['id'])) {
             $user_id = $_GET['id'];
             $where = 'id =' . $user_id;
-            $data = $Subject->show(1, $where);
-            $classes = $getSubject->show();
+            $data = $this->accountModel->show(1, $where);
+            $classes = $this->subjectModel->show();
             $user_id = $data['id'];
-            $singleUserData = $Subject->user_class_subject($user_id, 'subject');
-            $this->view('assignSubject', $this->sessionId, $data, '', $classes, $singleUserData);
+            $singleUserData = $this->accountModel->user_class_subject($user_id, 'subject');
+            $this->view('assignSubject', $data, '', $classes, $singleUserData);
         }
     }
 
     public function ClassAssignTo()
     {
-        $assignTo = $this->model('studentModel');
-        $getClass = $this->model('classModel');
-        $assignClass = $this->model('userHasClassModel');
         if (isset($_POST['submit'])) {
             if (isset($_POST['class_id'])) {
                 $user_id = $_POST['user_id'];
                 $class_id = $_POST['class_id'];
-                $assignClass->assign_class_subject($user_id, $class_id);
+                $this->hasClassModel->assign_class_subject($user_id, $class_id);
 
                 $where = 'id =' . $user_id;
-                $data = $assignTo->show(1, $where);
-                $classes = $getClass->show();
+                $data = $this->accountModel->show(1, $where);
+                $classes = $this->classModel->show();
                 $user_id = $data['id'];
-                $singleUserData = $assignTo->user_class_subject($user_id, 'class');
-                $this->view('assignClass', $this->sessionId, $data, '', $classes, $singleUserData);
+                $singleUserData = $this->accountModel->user_class_subject($user_id, 'class');
+                $this->view('assignClass', $data, '', $classes, $singleUserData);
             }
         }
     }
 
     public function SubjectAssignTo()
     {
-        $assignTo = $this->model('studentModel');
-        $getSubject = $this->model('subjectModel');
-        $assignSubject = $this->model('userHasSubjectModel');
         if (isset($_POST['submit'])) {
             if (isset($_POST['subject_id'])) {
                 $user_id = $_POST['user_id'];
                 $subject_id = $_POST['subject_id'];
-                $assignSubject->assign_class_subject($user_id, '', $subject_id);
+                $this->hasSubjectModel->assign_class_subject($user_id, '', $subject_id);
                 $where = 'id =' . $user_id;
-                $data = $assignTo->show(1, $where);
-                $classes = $getSubject->show();
+                $data = $this->accountModel->show(1, $where);
+                $classes = $this->subjectModel->show();
                 $user_id = $data['id'];
-                $singleUserData = $assignTo->user_class_subject($user_id, 'subject');
-                $this->view('assignSubject', $this->sessionId, $data, '', $classes, $singleUserData);
+                $singleUserData = $this->accountModel->user_class_subject($user_id, 'subject');
+                $this->view('assignSubject', $data, '', $classes, $singleUserData);
             }
         }
     }
 
     public function unAssignClass()
     {
-        $unAssign = $this->model('studentModel');
-        $getClass = $this->model('classModel');
-        $unAssignClass = $this->model('userHasClassModel');
         if (isset($_GET['type']) && $_GET['type'] == 'un_assign') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['user_id'];
                 $class_id = $_GET['id'];
                 $where = "user_id = " . $user_id . " And class_id = " . $class_id;
-                $unAssignClass->delete($where);
+                $this->hasClassModel->delete($where);
                 $where = 'id =' . $user_id;
-                $data = $unAssign->show(1, $where);
-                $classes = $getClass->show();
+                $data = $this->accountModel->show(1, $where);
+                $classes = $this->classModel->show();
                 $user_id = $data['id'];
-                $singleUserData = $unAssign->user_class_subject($user_id, 'class');
-                $this->view('assignClass', $this->sessionId, $data, '', $classes, $singleUserData);
+                $singleUserData = $this->accountModel->user_class_subject($user_id, 'class');
+                $this->view('assignClass', $data, '', $classes, $singleUserData);
 
             }
         }
@@ -215,26 +205,29 @@ class studentController extends Framework
 
     public function unAssignSubject()
     {
-        $unAssign = $this->model('studentModel');
-        $getSubject = $this->model('subjectModel');
-        $unAssignSubject = $this->model('userHasSubjectModel');
         if (isset($_GET['type']) && $_GET['type'] == 'un_assign') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['user_id'];
                 $class_id = $_GET['id'];
                 $where = "user_id = " . $user_id . " And subject_id = " . $class_id;
-                $unAssignSubject->delete($where);
+                $this->hasSubjectModel->delete($where);
 
                 $where = 'id =' . $user_id;
-                $data = $unAssign->show(1, $where);
-                $classes = $getSubject->show();
+                $data = $this->accountModel->show(1, $where);
+                $classes = $this->subjectModel->show();
                 $user_id = $data['id'];
-                $singleUserData = $unAssign->user_class_subject($user_id, 'subject');
-                $this->view('assignSubject', $this->sessionId, $data, '', $classes, $singleUserData);
+                $singleUserData = $this->accountModel->user_class_subject($user_id, 'subject');
+                $this->view('assignSubject', $data, '', $classes, $singleUserData);
 
             }
         }
+    }
 
+    /** table body function  */
+    public function tableBody(){
+        $where = "status = 1 AND role_id = 4";
+        $tableBody = $this->accountModel->show(false, $where);
+        return $tableBody;
     }
 
 }

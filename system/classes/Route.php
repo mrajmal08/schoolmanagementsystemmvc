@@ -6,9 +6,9 @@ class Route
     public $method = 'index';
     public $param = [];
 
+    /** set constructor to get the controllers */
     public function __construct()
     {
-        require_once "../application/helpers/functions.php";
         $url = $this->url();
         if (!empty($url)) {
             if (file_exists("../application/controllers/" . $url[0] . ".php")) {
@@ -39,6 +39,7 @@ class Route
         call_user_func_array([$this->controller, $this->method], $this->param);
     }
 
+    /** function for getting the clean url */
     public function url()
     {
         if (isset($_GET['url'])) {

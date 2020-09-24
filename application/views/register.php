@@ -1,4 +1,6 @@
-<?php  $error = $myData; ?>
+<?php  $error = $body;
+?>
+
 <!DOCTYPE html>
 <html class="h-100" lang="en">
 <head>
@@ -78,7 +80,7 @@
                                     <select class="form-control form-control-lg" name="role" required>
                                         <option disabled selected>--Select Role--</option>
                                         <?php
-                                        foreach ($myData as $row) {
+                                        foreach ($body as $row) {
                                             ?>
                                             <option value="<?= $row['id'] ?>"><?= $row['name'] ?>
                                             </option>

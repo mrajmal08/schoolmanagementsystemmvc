@@ -7,5 +7,4 @@ class teacherModel extends Database
     {
         parent::__construct('user');
     }
-
 }

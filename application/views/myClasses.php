@@ -1,4 +1,6 @@
 <?php
+$sessionId = $this->getSession('id');
+$sessionName = $this->getSession('name');
 $classes = $body;
 ?>
 <!DOCTYPE html>
@@ -24,8 +26,8 @@ $classes = $body;
             </a>
         </div>
     </div>
-    <?php include 'includes/header.php' ?>
-    <?php include "includes/sidebar.php"; ?>
+    <?php include '../includes/header.php' ?>
+    <?php include "../includes/sidebar.php"; ?>
     <div class="content-body">
         <div class="container-fluid">
             <div class="row">

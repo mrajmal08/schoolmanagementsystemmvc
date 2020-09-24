@@ -1,7 +1,8 @@
 <?php
-$error = $sess;
+$sessionId = $this->getSession('id');
+$sessionName = $this->getSession('name');
+$error = $errors;
 $user = $userId;
-$session = $myData;
 $tableBody = $body;
 
 if ($user) {

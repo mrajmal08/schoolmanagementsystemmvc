@@ -13,7 +13,7 @@ trait Admin
 //        $table = $this->table;
         if (!empty($user_id)) {
             $data['data'] = ['status' => 1];
-            $where = "id = " . $user_id;
+            $where = "id =" . $user_id;
             return $this->update($data, $where);
         } else {
             return false;
@@ -32,5 +32,20 @@ trait Admin
                  role.name as rolename FROM user INNER JOIN role ON user.role_id = role.id WHERE
                  user.status = 0";
         return $this->get_data_for_query($query);
+    }
+
+    /**
+     * this function used only for query execution
+     * @param $query
+     * @return mixed
+     */
+    protected function get_data_for_query($query)
+    {
+        if (!empty($query)) {
+            $data = $this->conn->query($query);
+            return $data->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return false;
+        }
     }
 }

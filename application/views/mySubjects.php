@@ -1,4 +1,6 @@
 <?php
+$sessionId = $this->getSession('id');
+$sessionName = $this->getSession('name');
 $subjects = $body;
 ?>
 <!DOCTYPE html>

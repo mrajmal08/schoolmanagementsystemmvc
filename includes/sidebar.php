@@ -1,6 +1,6 @@
 <?php
-$user_id = $myData;
-$where = 'id =' . $user_id[0];
+$user_id = $sessionId;
+$where = 'id =' . $user_id;
 $sidebar = $sc->show(false, $where);
 ?>
 <div class="nk-sidebar">

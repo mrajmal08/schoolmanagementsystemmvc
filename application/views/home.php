@@ -1,5 +1,7 @@
 <?php
-//session_start();
+  $sessionId = $this->getSession('id');
+  $sessionName = $this->getSession('name');
+  $sessionRole = $this->getSession('role');
 ?>
 <!DOCTYPE html>
 <html lang="en">

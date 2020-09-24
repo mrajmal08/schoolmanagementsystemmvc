@@ -3,29 +3,27 @@
 class principalController extends Framework
 {
     use Validation;
-    protected $sessionId;
     protected $tbody;
+    protected $accountModel;
 
     /** initialize the constructor */
     public function __construct()
     {
-        $this->sessionId = getSessionData();
-        $this->tbody = $this->model('principalModel');
-        $where = "status = 1 AND role_id = 2";
-        $this->tbody = $this->tbody->show(false, $where);
+        $this->helper('functions');
+        $this->accountModel = $this->model('principalModel');
+        $this->tbody = $this->tableBody();
     }
 
     /** getting default page of principal with data and session */
     public function index()
     {
-        $this->view('principal', $this->sessionId, $this->tbody);
+        $this->view('principal', $this->tbody);
     }
 
     /** create principal */
     public function createPrincipal()
     {
-        $create = $this->model('principalModel');
-        $sessionRole = $this->sessionId[2];
+        $sessionRole = $this->getSession('role');
         if ($sessionRole == 1) {
             $status = 1;
         } else {
@@ -41,7 +39,7 @@ class principalController extends Framework
             $this->validate($data, $rules);
             if ($this->errors) {
                 $error = $this->errors;
-                $this->view('principal', $this->sessionId, $this->tbody, $error);
+                $this->view('principal', $this->tbody, $error);
             } else {
                 $name = input('name');
                 $email = input('email');
@@ -65,9 +63,9 @@ class principalController extends Framework
                     'contact', 'gender', 'role_id', 'status'];
                 $values = [':name', ':email', ':password', ':address',
                     ':contact', ':gender', ':role', ':status'];
-                $result = $create->insert($columns, $values, $data);
+                $result = $this->accountModel->insert($columns, $values, $data);
                 if ($result) {
-                    $this->view('principal', $this->sessionId, $this->tbody);
+                    $this->view('principal', $this->tbody);
                 } else {
                     return "Some thing problem during form submission";
                 }
@@ -78,13 +76,12 @@ class principalController extends Framework
     /** edit get user id principal */
     public function edit()
     {
-        $edit = $this->model('principalModel');
         if (isset($_GET['type']) && $_GET['type'] == 'edit') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
                 $where = 'id =' . $user_id;
-                $user = $edit-> show(1, $where);
-                $this->view('principal', $this->sessionId, $this->tbody, '', $user);
+                $user = $this->accountModel-> show(1, $where);
+                $this->view('principal', $this->tbody, '', $user);
 
             }
         }
@@ -93,30 +90,35 @@ class principalController extends Framework
     /** Update principal */
     public function updatePrincipal()
     {
-        $update = $this->model('principalModel');
         if (isset($_POST['edit'])) {
             unset($_POST['edit']);
             unset($_POST['submitPrincipal']);
             $data['data'] = $_POST;
             $where = "id = " . $_POST['id'];
             unset($data['data']['id']);
-            $result = $update->update($data, $where);
+            $result = $this->accountModel->update($data, $where);
             if ($result) {
-               $this->view('principal', $this->sessionId, $this->tbody);
+               $this->view('principal', $this->tbody);
             }
         }
     }
 
     /** delete principal */
     public function delete(){
-        $delete = $this->model('principalModel');
         if (isset($_GET['type']) && $_GET['type'] == 'delete') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
                 $where = "id = " . $user_id;
-                $delete->delete($where);
-                $this->view('principal',$this->sessionId, $this->tbody);
+                $this->accountModel->delete($where);
+                $this->view('principal', $this->tbody);
             }
         }
+    }
+
+    /** table body function  */
+    public function tableBody(){
+        $where = "status = 1 AND role_id = 2";
+        $tableBody = $this->accountModel->show(false, $where);
+        return $tableBody;
     }
 }

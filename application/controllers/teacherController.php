@@ -3,29 +3,27 @@
 class teacherController extends Framework
 {
     use Validation;
-    protected $sessionId;
     protected $tableBody;
+    protected $accountModel;
 
     /** initialize the constructor */
     public function __construct()
     {
-        $this->sessionId = getSessionData();
-        $this->tableBody = $this->model('teacherModel');
-        $where = "status = 1 AND role_id = 3";
-        $this->tableBody = $this->tableBody->show(false, $where);
+        $this->helper('functions');
+        $this->accountModel = $this->model('teacherModel');
+        $this->tableBody = $this->tableBody();
     }
 
     /** load default method with session and all teachers */
     public function index()
     {
-        $this->view('teacher', $this->sessionId, $this->tableBody);
+        $this->view('teacher', $this->tableBody);
     }
 
     /** create principal */
     public function createTeacher()
     {
-        $create = $this->model('teacherModel');
-        $sessionRole = $this->sessionId[2];
+        $sessionRole = $this->getSession('role');
         if ($sessionRole == 1) {
             $status = 1;
         } else {
@@ -41,7 +39,7 @@ class teacherController extends Framework
             $this->validate($data, $rules);
             if ($this->errors) {
                 $error = $this->errors;
-                $this->view('teacher', $this->sessionId, $this->tableBody, $error);
+                $this->view('teacher', $this->tableBody, $error);
             } else {
                 $name = input('name');
                 $email = input('email');
@@ -59,15 +57,14 @@ class teacherController extends Framework
                     'gender' => $gender,
                     'role' => $role,
                     'status' => $status
-
                 ];
                 $columns = ['name', 'email', 'password', 'address',
                     'contact', 'gender', 'role_id', 'status'];
                 $values = [':name', ':email', ':password', ':address',
                     ':contact', ':gender', ':role', ':status'];
-                $result = $create->insert($columns, $values, $data);
+                $result = $this->accountModel->insert($columns, $values, $data);
                 if ($result) {
-                    $this->view('teacher', $this->sessionId, $this->tableBody);
+                    $this->view('teacher', $this->tableBody);
                 } else {
                     return "Some thing problem during form submission";
                 }
@@ -78,13 +75,12 @@ class teacherController extends Framework
     /** edit get user id principal */
     public function edit()
     {
-        $edit = $this->model('teacherModel');
         if (isset($_GET['type']) && $_GET['type'] == 'edit') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
                 $where = 'id =' . $user_id;
-                $user = $edit->show(1, $where);
-                $this->view('teacher', $this->sessionId, $this->tableBody, '', $user);
+                $user = $this->accountModel->show(1, $where);
+                $this->view('teacher', $this->tableBody, '', $user);
 
             }
         }
@@ -93,16 +89,15 @@ class teacherController extends Framework
     /** Update principal */
     public function updateTeacher()
     {
-        $update = $this->model('teacherModel');
         if (isset($_POST['edit'])) {
             unset($_POST['edit']);
             unset($_POST['submitTeacher']);
             $data['data'] = $_POST;
             $where = "id = " . $_POST['id'];
             unset($data['data']['id']);
-            $result = $update->update($data, $where);
+            $result = $this->accountModel->update($data, $where);
             if ($result) {
-                $this->view('teacher', $this->sessionId, $this->tableBody);
+                $this->view('teacher', $this->tableBody);
             }
         }
     }
@@ -114,10 +109,18 @@ class teacherController extends Framework
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
                 $where = "id = " . $user_id;
-                $delete->delete($where);
-                $this->view('teacher', $this->sessionId, $this->tableBody);
+                $this->accountModel->delete($where);
+                $this->view('teacher', $this->tableBody);
             }
         }
+    }
+
+    /** table body function  */
+    public function tableBody()
+    {
+        $where = "status = 1 AND role_id = 3";
+        $tableBody = $this->accountModel->show(false, $where);
+        return $tableBody;
     }
 
 }

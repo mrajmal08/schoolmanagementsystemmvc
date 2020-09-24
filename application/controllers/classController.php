@@ -4,24 +4,23 @@ class classController extends Framework
 {
     use Validation;
     use Student;
-    protected $sessionId;
     protected $tableBody;
+    protected $accountModel;
 
     public function __construct()
     {
-        $this->sessionId = getSessionData();
-        $this->tableBody = $this->model('classModel');
-        $this->tableBody = $this->tableBody->show();
+        $this->helper('functions');
+        $this->accountModel = $this->model('classModel');
+        $this->tableBody = $this->accountModel->show();
     }
     public function index()
     {
-        $this->view('classes', $this->sessionId, $this->tableBody);
+        $this->view('classes', $this->tableBody);
     }
 
     /** create principal */
     public function createClass()
     {
-        $create = $this->model('classModel');
         if (isset($_POST['submitClass'])) {
             $rules = [
                 'name' => 'required|max:12',
@@ -30,7 +29,7 @@ class classController extends Framework
             $this->validate($data, $rules);
             if ($this->errors) {
                 $error = $this->errors;
-                $this->view('classes', $this->sessionId, $this->tableBody, $error);
+                $this->view('classes', $this->tableBody, $error);
             } else {
                 $name = input('name');
                 $number = input('number');
@@ -40,9 +39,9 @@ class classController extends Framework
                 ];
                 $columns = ['name', 'number'];
                 $values = [':name', ':number'];
-                $result = $create->insert($columns, $values, $data);
+                $result = $this->accountModel->insert($columns, $values, $data);
                 if ($result) {
-                    $this->view('classes', $this->sessionId, $this->tableBody);
+                    $this->view('classes', $this->tableBody);
                 } else {
                     return "Something problem";
                 }
@@ -53,13 +52,12 @@ class classController extends Framework
     /** edit get user id principal */
     public function edit()
     {
-        $edit = $this->model('classModel');
         if (isset($_GET['type']) && $_GET['type'] == 'edit') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
                 $where = 'id =' . $user_id;
-                $user = $edit->show(1, $where);
-                $this->view('classes', $this->sessionId, $this->tableBody, '', $user);
+                $user = $this->accountModel->show(1, $where);
+                $this->view('classes', $this->tableBody, '', $user);
 
             }
         }
@@ -68,16 +66,15 @@ class classController extends Framework
     /** Update principal */
     public function updateClass()
     {
-        $update = $this->model('classModel');
         if (isset($_POST['edit'])) {
             unset($_POST['edit']);
             unset($_POST['submitClass']);
             $data['data'] = $_POST;
             $where = "id = " . $_POST['class_id'];
             unset($data['data']['class_id']);
-            $result = $update->update($data, $where);
+            $result = $this->accountModel->update($data, $where);
             if ($result) {
-                $this->view('classes', $this->sessionId, $this->tableBody);
+                $this->view('classes', $this->tableBody);
             }
         }
     }
@@ -85,13 +82,12 @@ class classController extends Framework
     /** delete principal */
     public function delete()
     {
-        $delete = $this->model('classModel');
         if (isset($_GET['type']) && $_GET['type'] == 'delete') {
             if (isset($_GET['id'])) {
                 $user_id = $_GET['id'];
                 $where = "id = " . $user_id;
-                $delete->delete($where);
-                $this->view('classes', $this->sessionId, $this->tableBody);
+                $this->accountModel->delete($where);
+                $this->view('classes', $this->tableBody);
             }
         }
     }
@@ -99,8 +95,7 @@ class classController extends Framework
     /** get all the related classes*/
     public function myClass()
     {
-        $class = $this->model('classModel');
-        $getClasses = $class->user_class_subject($this->sessionId[0], 'class');
-        $this->view('myClasses', $this->sessionId, $getClasses);
+        $getClasses = $this->accountModel->user_class_subject($this->getSession('id'), 'class');
+        $this->view('myClasses', $getClasses);
     }
 }
